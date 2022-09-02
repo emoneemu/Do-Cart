@@ -10,7 +10,11 @@ from App_Payment.forms import BillingForm
 from django.contrib.auth.decorators import login_required
 
 # for payment
-
+import requests
+import socket
+from decimal import Decimal
+from django.views.decorators.csrf import csrf_exempt
+#from sslcommerz_python.payment import SSLCSession
 
 # Create your views here.
 @login_required
@@ -68,7 +72,7 @@ def payment(request):
     return redirect(response_data['GatewayPageURL'])
 
 
-#@csrf_exempt
+@csrf_exempt
 def complete(request):
     if request.method == 'POST' or request.method == 'post':
         payment_data = request.POST
@@ -86,10 +90,10 @@ def complete(request):
 
 @login_required
 def purchase(request, val_id, tran_id):
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    order_qs = Order.objects.filter(user=request.user, orderd=False)
     order = order_qs[0]
     orderId = tran_id
-    order.ordered = True
+    order.orderd = True
     order.orderId = orderId
     order.paymentId = val_id
     order.save()
@@ -102,7 +106,7 @@ def purchase(request, val_id, tran_id):
 @login_required
 def order_view(request):
     try:
-        orders = Order.objects.filter(user=request.user, ordered=True)
+        orders = Order.objects.filter(user=request.user, orderd=True)
         context = {"orders": orders}
     except:
         messages.warning(request, "You do no have an active order")
